@@ -15,8 +15,7 @@ def updateFeatureWeights(word_dict, bias, features, check):
 
     alpha = sum + bias
 
-    if word_dict[1] == 1:
-                                               # spam file
+    if word_dict[1] == 1:                                             # spam file
         if 1 * alpha <= 0:
             for word in word_dict[0]:
                 features[word] = features[word] + 1
@@ -43,19 +42,20 @@ for root, subdirs, files in os.walk(filename):
         for file in glob.glob("*.txt"):
             words = []
             with open(file, "r", encoding="latin1") as f1:
-                for line in f1:
-                    for word in line.strip().split():
+                contents = f1.readlines()
+                for line in range(len(contents)):
+                    for word in contents[line].strip().split():
                         words.append(word)
                         if word not in features:
                             features[word] = int(0)
 
             if(os.path.basename(os.path.normpath(root)) == "spam"):
                 spam_dict[file_count] = words, 1
-                spam_file_count = file_count + 1
+                file_count = file_count + 1
 
-            if(os.path.basename(os.path.normpath(root)) == "ham"):
+            elif(os.path.basename(os.path.normpath(root)) == "ham"):
                 spam_dict[file_count] = words, 2
-                spam_file_count = file_count + 1
+                file_count = file_count + 1
 
 r = list(range(1, len(spam_dict)+1))
 random.shuffle(r)
