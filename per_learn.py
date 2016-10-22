@@ -11,19 +11,19 @@ def updateFeatureWeights(word_dict, bias, features, check):
 
     sum = 0
     for word in word_dict[0]:
-        sum = sum + int(features[word])
+        sum = sum + (int(features[word])*word_dict[0][word])
 
     alpha = sum + bias
 
-    if word_dict[2] == 1:                                             # spam file
+    if word_dict[1] == 1:                                             # spam file
         if 1 * alpha <= 0:
-            for word in word_dict[1]:
+            for word in word_dict[0]:
                 features[word] = features[word] + 1
             bias = bias + 1
 
-    if word_dict[2] == 2:
+    if word_dict[1] == 2:
         if -(1 * alpha) <= 0:                                              # ham file
-            for word in word_dict[1]:
+            for word in word_dict[0]:
                 features[word] = features[word] - 1
             bias = bias - 1
 
@@ -38,24 +38,25 @@ for root, subdirs, files in os.walk(filename):
     if(os.path.basename(os.path.normpath(root)) == "spam" or os.path.basename(os.path.normpath(root)) == "ham"):
         os.chdir(root)
         for file in glob.glob("*.txt"):
-            words = []
-            unique_words=[]
+            words = {}
+
             with open(file, "r", encoding="latin1") as f1:
                 contents = f1.readlines()
                 for line in range(len(contents)):
                     for word in contents[line].strip().split():
-                        if word not in unique_words:
-                            unique_words.append(word)
-                        words.append(word)
+                        if word in words:
+                            words[word] = words[word] + 1
+                        else:
+                            words[word] = 0
                         if word not in features:
                             features[word] = int(0)
 
             if(os.path.basename(os.path.normpath(root)) == "spam"):
-                spam_dict[file_count] = words, unique_words, 1
+                spam_dict[file_count] = words, 1
                 file_count = file_count + 1
 
             elif(os.path.basename(os.path.normpath(root)) == "ham"):
-                spam_dict[file_count] = words, unique_words, 2
+                spam_dict[file_count] = words, 2
                 file_count = file_count + 1
 
 # running through all the training data for the given number of iterations
